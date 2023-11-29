@@ -3,7 +3,7 @@
 % method: 'DFP' or 'BFGS'
 % tol: user-defined termination tolerance
 function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, printout)
-    
+    MAX_ITER = 1e5;
     sigma = 0.5;
     epsilon = 0.2;
     alpha = 2;
@@ -20,19 +20,26 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
     [lambda, deltaN] = Wolf(F, lambda0, epsilon, sigma, alpha);
     
     N_eval = N_eval + deltaN; % Add amount evals from wolf
+    N_iter = 1; % one iteration completed
 
     x = x0 + lambda*dk;
     lastx = x0;
     lastgk = gk;
+    
+    while true
+        % We enter this loop with a fresh new x
 
-    N_iter = 2; % We have already done iteration 1 at this point
-    
-    normg = norm(gk);
-    while normg > tol
-    
         gk = grad(f, x);
         N_eval = N_eval + N*2; %from grad
         normg = norm(gk);
+
+        print_iter(N_iter, x, fval, normg) % Print the iteration which got us to x
+        
+        if normg <= tol
+            break
+        end
+
+        % Another iteration should be done. Get matrix Dk
 
         qk = gk - lastgk;
         pk = x - lastx;
@@ -47,26 +54,22 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
             end
         end
        
-        
+        % Now perform wolf step
+
         dk = -Dk*gk;
         F = @(lambda) f(x+lambda*dk);
         [lambda, deltaN, fval] = Wolf(F, lambda0, epsilon, sigma, alpha);
-        N_eval = N_eval + deltaN;  % from wolf
-        
-        
-        print_iter(N_iter, x, fval, normg)
 
+        N_eval = N_eval + deltaN;  % from wolf
+        N_iter = N_iter + 1;
         
-        lastgk = gk;
         lastx = x;
         x = x + lambda*dk;
-    
-        N_iter = N_iter + 1;
+        lastgk = gk;    
+        
+        if N_iter >= MAX_ITER
+            error('Max iterations reached.')
+        end
     end
-
-    normg = norm(grad(f,x));
-    N_eval = N_eval + 2*N; % from grad
-
     
-
 end
