@@ -1,6 +1,5 @@
-function [lambda,deltaN] = armijo(lambda, F, epsilon, alpha, gradf0)
-    f0 = F(0);
-    deltaN = 1;
+function [lambda,deltaN] = armijo(lambda, F, epsilon, alpha, gradf0, f0)
+    deltaN = 0;
     while F(alpha*lambda) < f0 + epsilon * gradf0*alpha*lambda
         lambda = alpha *lambda;
         deltaN = deltaN +1;
