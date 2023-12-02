@@ -17,12 +17,13 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
 
     dk = -gk;
     F = @(lambda) f(x0+lambda*dk);
-    [lambda, deltaN] = Wolf(F, lambda0, epsilon, sigma, alpha);
+    [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha);
     
     N_eval = N_eval + deltaN; % Add amount evals from wolf
     N_iter = 1; % one iteration completed
 
     x = x0 + lambda*dk;
+   
     lastx = x0;
     lastgk = gk;
     
@@ -44,7 +45,8 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         qk = gk - lastgk;
         pk = x - lastx;
         
-        if mod(N_iter, N) == 0
+        if restart && mod(N_iter, N) == 0
+            'RESTART'
             Dk = eye(N, N);
         else
             if strcmp(method, 'DFP')
@@ -58,7 +60,7 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
 
         dk = -Dk*gk;
         F = @(lambda) f(x+lambda*dk);
-        [lambda, deltaN, fval] = Wolf(F, lambda0, epsilon, sigma, alpha);
+        [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha);
 
         N_eval = N_eval + deltaN;  % from wolf
         N_iter = N_iter + 1;
@@ -66,7 +68,8 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         lastx = x;
         x = x + lambda*dk;
         lastgk = gk;    
-        
+
+
         if N_iter >= MAX_ITER
             error('Max iterations reached.')
         end

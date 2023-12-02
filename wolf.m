@@ -1,4 +1,4 @@
-function [lambda, deltaN, fval] = Wolf(F, lambda0, epsilon, sigma, alpha)
+function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha)
     a = 0;
     gradf0 = grad(F,0);
     f0 = F(0);
