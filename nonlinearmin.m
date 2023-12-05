@@ -14,10 +14,12 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
     Dk = eye(N,N); % Identity as first choice
     gk = grad(f,x0);
     N_eval = N*2; % From grad
-
+ 
     dk = -gk;
+    grad0 = dk'* gk;
     F = @(lambda) f(x0+lambda*dk);
-    [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha);
+  
+    [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, grad0);
     
     N_eval = N_eval + deltaN; % Add amount evals from wolf
     N_iter = 1; % one iteration completed

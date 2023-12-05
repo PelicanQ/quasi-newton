@@ -1,8 +1,7 @@
-function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha)
+function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0)
     a = 0;
-    gradf0 = grad(F,0);
     f0 = F(0);
-    deltaN = 3;
+    deltaN = 1;
     
     lambda = armijo(lambda0, F, epsilon, alpha, gradf0, f0);
     deltaN = deltaN +2;
