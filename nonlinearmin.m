@@ -50,7 +50,6 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         pk = x - lastx;
         
         if restart && mod(N_iter, N) == 0
-            'RESTART'
             Dk = eye(N, N);
         else
             if strcmp(method, 'DFP')
