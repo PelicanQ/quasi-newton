@@ -39,7 +39,6 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         if printout
             print_iter(N_iter, x, fval, normg, N_eval, lambda) % Print the iteration which got us to x
         end
-
         if normg <= tol
             break
         end

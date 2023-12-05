@@ -2,7 +2,6 @@ function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0
     a = 0;
     f0 = F(0);
     deltaN = 1;
-    
     lambda = armijo(lambda0, F, epsilon, alpha, gradf0, f0);
     deltaN = deltaN +2;
     
@@ -13,8 +12,10 @@ function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0
             a = lambda;
             lambda = alpha*lambda;
             deltaN = deltaN +2;
+
             if abs(grad(F, lambda)) <= -sigma*gradf0
-                return;
+                % wolfe satisfied
+                break;
             end
         end 
         b = lambda;
@@ -38,5 +39,4 @@ function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0
     if (isnan(fval) || fval > f0)
         error('Bad job of the line search!')
     end 
-        
 end
