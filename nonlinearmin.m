@@ -3,24 +3,24 @@
 % method: 'DFP' or 'BFGS'
 % tol: user-defined termination tolerance
 function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, printout)
-    MAX_ITER = 1e5;
+    MAX_ITER = 1e4;
     sigma = 0.5;
     epsilon = 0.2;
     alpha = 2;
-    lambda0 = 0.1;
+    lambda0 = 0.01;
     
     N = length(x0); % Antal variabler
     
-    Dk = eye(N,N); % Identity as first choice
-    gk = grad(f,x0);
+    Dk = eye(N, N); % Identity as first choice
+    gk = grad(f, x0);
     N_eval = N*2; % From grad
  
     dk = -gk;
     gradf0 = dk' * gk;
-    F = @(lambda) f(x0+lambda*dk);
-  
-    [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
+    F = @(lambda) f(x0 + lambda*dk);
     
+
+    [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
     N_eval = N_eval + deltaN; % Add amount evals from wolf
     N_iter = 1; % one iteration completed
 
@@ -72,12 +72,10 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         x = x + lambda*dk;
         lastgk = gk;    
 
-
         if N_iter >= MAX_ITER
             error('Max iterations reached.')
         end
     end
-    
 end
 
 % Testa linje sök algoritmer
