@@ -1,5 +1,5 @@
 epsilon = 0.1;
-tol = 1e-3;
+tol = 1e-4;
 restart = 0;
 printout = 0;
 fprintf('\n%12s %12s %12s %12s %12s %15s\n\n','Method','N', 'iter', 'f(x)', 'norm(grad)', 'ls fun evals');
@@ -105,6 +105,26 @@ fprintf('%12s %12.4f %12.4f %12.4f %12f %12.4f\n','DFP', N, N_iter, F(x), normg,
 
 [x, N_eval, N_iter, normg] = nonlinearmin(F, x0, 'BFGS', tol, restart, printout);
 fprintf('%12s %12.4f %12.4f %12.4f %12f %12.4f\n','BFGS', N, N_iter, F(x), normg, N_eval)
+
+% %% Test Rosenbrock
+% printout = 1;
+% F = @(x) rosenbrock(x);
+% fprintf('Rosenbrock without restart \nDFP: \n')
+% [x, N_eval, N_iter, normg] = nonlinearmin(F, [0;0], 'DFP', tol, restart, printout);
+% 
+% %% BFGS
+% fprintf('BFGS: \n')
+% [x, N_eval, N_iter, normg] = nonlinearmin(F, [0;0], 'BFGS', tol, restart, printout);
+% 
+% %% With restart
+% restart = 1;
+% 
+% fprintf('Rosenbrock with restart \nDFP: \n')
+% [x, N_eval, N_iter, normg] = nonlinearmin(F, [0;0], 'DFP', tol, restart, printout);
+% 
+% %% BFGS
+% fprintf('BFGS: \n')
+% [x, N_eval, N_iter, normg] = nonlinearmin(F, [0;0], 'BFGS', tol, restart, printout);
 
 
 
