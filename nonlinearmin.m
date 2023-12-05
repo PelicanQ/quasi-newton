@@ -76,3 +76,15 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
     end
     
 end
+
+% Testa linje sök algoritmer
+% Testa hela på kvadratiska metoder
+% 
+% Hur genererar vi ca 50 dimension kvadratisk funktion med positivt def?
+% Om vi tar en random 50x50 A så blir A'A har vi en positivt semidefinit
+% Sen plussa pytteliten I för att få den pos definit
+% 
+% wolf, man måste inte lägga in esp = 0.2 för armijo, man slipper några
+% derivator om med eps = 0;
+% bracketing är som armijo med eps = 0.
+
