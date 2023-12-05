@@ -16,10 +16,10 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
     N_eval = N*2; % From grad
  
     dk = -gk;
-    grad0 = dk'* gk;
+    gradf0 = dk' * gk;
     F = @(lambda) f(x0+lambda*dk);
   
-    [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, grad0);
+    [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
     
     N_eval = N_eval + deltaN; % Add amount evals from wolf
     N_iter = 1; % one iteration completed
@@ -35,9 +35,11 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         gk = grad(f, x);
         N_eval = N_eval + N*2; %from grad
         normg = norm(gk);
-
-        print_iter(N_iter, x, fval, normg) % Print the iteration which got us to x
         
+        if printout
+            print_iter(N_iter, x, fval, normg, N_eval, lambda) % Print the iteration which got us to x
+        end
+
         if normg <= tol
             break
         end
@@ -62,7 +64,8 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
 
         dk = -Dk*gk;
         F = @(lambda) f(x+lambda*dk);
-        [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha);
+        gradf0 = dk' * gk;
+        [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
 
         N_eval = N_eval + deltaN;  % from wolf
         N_iter = N_iter + 1;
