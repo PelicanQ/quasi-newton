@@ -6,14 +6,6 @@ function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0
     f0 = F(0);
     deltaN = 1; % from f0
     
-    if abs(gradf0) < 1e-30 || abs(gradf0) > 1e30
-        %lambda = lambda0;
-        %fval = f0;
-        %return
-        % if we're given a tiny derivative, we take the small lambda0 step
-        % anyways
-    end
-    
     a = 0;
 
     [lambda, armijoDeltaN]= armijo(lambda0, F, epsilon, alpha, gradf0, f0);
