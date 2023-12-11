@@ -17,9 +17,9 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
  
     dk = -gk;
     gradf0 = dk' * gk;
+
     F = @(lambda) f(x0 + lambda*dk);
     
-
     [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
     N_eval = N_eval + deltaN; % Add amount evals from wolf
     N_iter = 1; % one iteration completed
@@ -63,6 +63,13 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         dk = -Dk*gk;
         F = @(lambda) f(x+lambda*dk);
         gradf0 = dk' * gk;
+
+        if abs(gradf0) <= tol
+            % we checked and sometimes the directional derivative is 100
+            % times smaller than norm(gradient). We don't want to ask
+            % Wolf/Armijo to step on basically flat
+            break
+        end
         [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
 
         N_eval = N_eval + deltaN;  % from wolf
