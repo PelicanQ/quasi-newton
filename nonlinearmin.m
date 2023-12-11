@@ -8,11 +8,13 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
     epsilon = 0.2;
     alpha = 2;
     lambda0 = 0.01;
-    
+    N_iter = 0;
+
     N = length(x0); % Antal variabler
     
     Dk = eye(N, N); % Identity as first choice
     gk = grad(f, x0);
+    normg = norm(gk);
     N_eval = N*2; % From grad
  
     dk = -gk;
@@ -20,6 +22,17 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
 
     F = @(lambda) f(x0 + lambda*dk);
     
+    if abs(gradf0) <= tol
+        x = x0;
+        fprintf("Directional derivative inside tolerance. Exiting with no iteration\n")
+        fval = f(x);
+        N_eval = N_eval+1;
+        if printout
+            print_iter(N_iter, x, fval, normg, N_eval, 0); 
+        end
+        return
+    end
+
     [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
     N_eval = N_eval + deltaN; % Add amount evals from wolf
     N_iter = 1; % one iteration completed
