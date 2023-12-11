@@ -22,10 +22,8 @@ function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0
     deltaN = deltaN + 2; % from grad in if
     
     if abs(grad(F,lambda)) > -sigma*gradf0
-        
-        deltaN = deltaN + 2; % from grad in next while  
+        deltaN = deltaN + 2; % from grad in next while 
         while(grad(F, lambda)) < 0
-             
             deltaN = deltaN + 2;
             a = lambda;
             lambda = alpha*lambda;
@@ -43,6 +41,7 @@ function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0
         
         deltaN = deltaN + 2; % from next grad
         while abs(grad(F,lambda)) > -sigma*gradf0
+            
             deltaN = deltaN + 2;
             if grad(F,lambda) < 0
                 a = lambda;
@@ -51,7 +50,11 @@ function [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0
             end
             deltaN = deltaN +2;
             lambda = (a+b)/2;
-
+            
+            % stop if interval is too small.
+            if b-a < 1e-6
+                break
+            end
         end
     end
     fval = F(lambda);
