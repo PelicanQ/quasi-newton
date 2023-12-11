@@ -3,7 +3,7 @@ tol = 1e-4;
 restart = 0;
 printout = 0;
 fprintf('\n%12s %12s %12s %12s %12s %15s\n\n','Method','N', 'iter', 'f(x)', 'norm(grad)', 'ls fun evals');
-%
+
 %% Test 1
 
 N = 10;
