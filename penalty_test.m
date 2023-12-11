@@ -2,7 +2,7 @@ tol_minor = 1e-4;
 tol_major = 1e-6;  % if tolerances get too low, line search fails
 method = 'BFGS';
 MAX_ITER = 40;
-restart = 1;
+restart = 0;
 printout = 1;
 
 x0 = [-2 2 2 -1 -1]';
@@ -12,9 +12,9 @@ x3 = [0 1 0 0 0]';
 x4 = [0 0 10 0 0]';
 x5 = [1 2 3 4 5]'; % devil very large!
 x6 = [1 1 1 1 1]'; % comes back to around 1 0 0 0 0
-x = x2./10;
+x = x5./10;
 
-MU = 2;
+MU = 1e-8;
 phi = @(x, mu) exp(x(1)*x(2)*x(3)*x(4)*x(5)) + mu*penalty(x);
 lastx = x;
 i = 0;
