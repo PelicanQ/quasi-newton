@@ -53,6 +53,7 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
             print_iter(N_iter, x, fval, normg, N_eval, lambda) % Print the iteration which got us to x
         end
         if normg <= tol
+            fprintf("Exiting: norm(grad) below tolerance\n\n")
             break
         end
 
@@ -78,6 +79,7 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         gradf0 = dk' * gk;
 
         if abs(gradf0) <= tol
+            fprintf("Exiting: directional derivative size below tolerance\n\n")
             % we checked and sometimes the directional derivative is 100
             % times smaller than norm(gradient). We don't want to ask
             % Wolf/Armijo to step on basically flat
