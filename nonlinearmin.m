@@ -1,13 +1,6 @@
-% f: objective function
-% x0: initial point
-% method: 'DFP' or 'BFGS'
-% tol: user-defined termination tolerance
 function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, printout)
     MAX_ITER = 1e4;
-    sigma = 0.5;
-    epsilon = 0.2;
-    alpha = 2;
-    lambda0 = 0.01;
+    useDFP = strcmp(method, 'DFP');
     N_iter = 0;
 
     N = length(x0); % Antal variabler
@@ -18,22 +11,24 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
     N_eval = N*2; % From grad
  
     dk = -gk;
-    gradf0 = dk' * gk;
-
     F = @(lambda) f(x0 + lambda*dk);
-    
-    if abs(gradf0) <= tol
+    gradf0 = grad(F, 0);
+    N_eval = N_eval+2; % from 1D derivative
+
+    if gradf0 > 0
+        warning("Exiting. Derivative to line search was positive.")
+        return;
+    end
+    if normg <= tol
         x = x0;
-        fprintf("Directional derivative inside tolerance. Exiting with no iteration\n")
-        fval = f(x);
-        N_eval = N_eval+1;
         if printout
-            print_iter(N_iter, x, fval, normg, N_eval, 0); 
+            print_iter(0, x0, F(0), normg, N_eval, 0)
         end
         return
     end
+    
+    [lambda, deltaN, fval] = line_search(F, gradf0);
 
-    [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
     N_eval = N_eval + deltaN; % Add amount evals from wolf
     N_iter = 1; % one iteration completed
 
@@ -41,7 +36,8 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
    
     lastx = x0;
     lastgk = gk;
-    
+
+
     while true
         % We enter this loop with a fresh new x
 
@@ -52,6 +48,7 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         if printout
             print_iter(N_iter, x, fval, normg, N_eval, lambda) % Print the iteration which got us to x
         end
+
         if normg <= tol
             fprintf("Exiting: norm(grad) below tolerance\n\n")
             break
@@ -65,7 +62,7 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
         if restart && mod(N_iter, N) == 0
             Dk = eye(N, N);
         else
-            if strcmp(method, 'DFP')
+            if useDFP
                 Dk = DFP(pk, qk, Dk);
             else
                 Dk = BFGS(pk, qk, Dk);
@@ -76,23 +73,33 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
 
         dk = -Dk*gk;
         F = @(lambda) f(x+lambda*dk);
-        gradf0 = dk' * gk;
+        gradf0 = grad(F, 0);
+         
+        N_eval = N_eval + 2; % from 1D deriv
 
+        if gradf0 > 0
+            warning("Exiting. Derivative to line search was positive.")
+            break
+        end
+        
+        
         if abs(gradf0) <= tol
             fprintf("Exiting: directional derivative size below tolerance\n\n")
             % we checked and sometimes the directional derivative is 100
-            % times smaller than norm(gradient). We don't want to ask
-            % Wolf/Armijo to step on basically flat
+            % times smaller than norm(gradient). This could cause errors
             break
         end
-        [lambda, deltaN, fval] = wolf(F, lambda0, epsilon, sigma, alpha, gradf0);
+
+
+        [lambda, deltaN, fval] = line_search(F, gradf0);
+        
 
         N_eval = N_eval + deltaN;  % from wolf
         N_iter = N_iter + 1;
         
         lastx = x;
         x = x + lambda*dk;
-        lastgk = gk;    
+        lastgk = gk;
 
         if N_iter >= MAX_ITER
             error('Max iterations reached.')
