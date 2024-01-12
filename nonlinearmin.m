@@ -12,7 +12,7 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
  
     dk = -gk;
     F = @(lambda) f(x0 + lambda*dk);
-    gradf0 = grad(F, 0);
+    gradf0 = dk' * gk;
     N_eval = N_eval+2; % from 1D derivative
 
     if gradf0 > 0
@@ -73,7 +73,7 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
 
         dk = -Dk*gk;
         F = @(lambda) f(x+lambda*dk);
-        gradf0 = grad(F, 0);
+        gradf0 = dk' * gk;
          
         N_eval = N_eval + 2; % from 1D deriv
 
@@ -82,13 +82,13 @@ function [x, N_eval, N_iter, normg] = nonlinearmin(f, x0, method, tol, restart, 
             break
         end
         
-        
-        if abs(gradf0) <= tol
-            fprintf("Exiting: directional derivative size below tolerance\n\n")
-            % we checked and sometimes the directional derivative is 100
-            % times smaller than norm(gradient). This could cause errors
-            break
-        end
+        % 
+        % if abs(gradf0) <= tol
+        %     fprintf("Exiting: directional derivative size below tolerance\n\n")
+        %     % we checked and sometimes the directional derivative is 100
+        %     % times smaller than norm(gradient). This could cause errors
+        %     break
+        % end
 
 
         [lambda, deltaN, fval] = line_search(F, gradf0);
